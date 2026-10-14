@@ -1,0 +1,24 @@
+info:
+  name: Create product
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{api}}/products"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Suco de Laranja",
+        "description": "Suco de laranja natural feito na hora",
+        "price": "10.00"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
