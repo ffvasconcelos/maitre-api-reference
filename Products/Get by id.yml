@@ -5,7 +5,11 @@ info:
 
 http:
   method: GET
-  url: "{{api}}/products/5a79876a-1b09-4d53-b2cc-b842d706633a"
+  url: "{{api}}/products/:id"
+  params:
+    - name: id
+      value: e3c27432-261b-4a1f-900e-1c1d42b1fb8a
+      type: path
   auth: inherit
 
 settings:

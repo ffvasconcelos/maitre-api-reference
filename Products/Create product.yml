@@ -10,9 +10,9 @@ http:
     type: json
     data: |-
       {
-        "name": "Suco de Laranja",
-        "description": "Suco de laranja natural feito na hora",
-        "price": "10.00"
+        "name": "Prato feito",
+        "description": "Prato feito montado pelo estabelecimento com a opção de carne do cliente",
+        "price": "35.00"
       }
   auth: inherit
 
