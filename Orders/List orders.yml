@@ -5,10 +5,14 @@ info:
 
 http:
   method: GET
-  url: "{{api}}/orders?status=Aberto"
+  url: "{{api}}/orders?table_id=aeeb47e7-c2cd-4666-886f-f9944ec48a0e"
   params:
     - name: status
-      value: Aberto
+      value: Fechado
+      type: query
+      disabled: true
+    - name: table_id
+      value: aeeb47e7-c2cd-4666-886f-f9944ec48a0e
       type: query
   auth: inherit
 
