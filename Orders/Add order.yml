@@ -1,0 +1,32 @@
+info:
+  name: Add order
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{api}}/orders"
+  body:
+    type: json
+    data: |-
+      {
+        "table_id": "aeeb47e7-c2cd-4666-886f-f9944ec48a0e",
+        "items": [
+          {
+            "product_id": "0b492945-d502-4b8a-ad75-bf242ffcfd79",
+            "quantity": 4
+          },
+          {
+            "product_id": "e3c27432-261b-4a1f-900e-1c1d42b1fb8a",
+            "quantity": 4
+          }
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

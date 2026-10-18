@@ -1,0 +1,29 @@
+info:
+  name: Add order items
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{api}}/orders/:id/items"
+  params:
+    - name: id
+      value: 614d74c1-2dfb-4e08-977d-5e865dc42242
+      type: path
+  body:
+    type: json
+    data: |-
+      [
+        {
+          "product_id": "e8dfb54c-40d1-446f-ad81-cbf48ad42fe1",
+          "quantity": 4
+        }
+      ]
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
