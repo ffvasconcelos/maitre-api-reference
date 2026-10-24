@@ -43,7 +43,7 @@ examples:
       type: json
       data: |-
         {
-          "detail": "Database unavailable (simulated)"
+          "detail": "Banco de dados indisponível."
         }
 docs: |
   # DB health
@@ -54,4 +54,4 @@ docs: |
 
   Domain errors use `{ "code": "stable_error_code", "detail": "message" }`. Validation errors (422) retain the native FastAPI `detail` array.
 
-  The 503 example uses an injected database failure. Its detail is illustrative: the current endpoint returns the exception text, without a domain code.
+  The 503 example uses an injected database failure. The endpoint returns the fixed public message "Banco de dados indisponível." without a domain code. Technical exception details are logged on the server.

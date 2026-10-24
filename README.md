@@ -19,7 +19,7 @@ Order filters `table_id` and `status` are disabled by default. Enable either par
 
 ## Request and response contracts
 
-Each of the 15 request files includes saved request/response examples for its success and applicable error outcomes. Examples were captured from the API using TestClient and a disposable PostgreSQL database; UUIDs and timestamps are illustrative. Saved examples are independent snapshots, not a live seeded dataset. Inspect them in Bruno without sending requests. The DB health 503 example uses an injected failure, with an illustrative exception message.
+Each of the 15 request files includes saved request/response examples for its success and applicable error outcomes. Examples were captured from the API using TestClient and a disposable PostgreSQL database; UUIDs and timestamps are illustrative. Saved examples are independent snapshots, not a live seeded dataset. Inspect them in Bruno without sending requests. The DB health 503 example uses an injected failure and the fixed public error message.
 
 - JSON requests declare `Content-Type: application/json`.
 - UUIDs and timestamps are JSON strings. Decimal response fields (`price`, `unit_price`, `subtotal`) are JSON strings; request examples also use strings for prices.
@@ -72,7 +72,7 @@ Domain errors return a stable machine-readable `code` and a human-readable `deta
 
 Validation failures retain the native FastAPI HTTP 422 format: `detail` is an array containing fields such as `type`, `loc`, `msg`, `input`, and sometimes `ctx`. They do not receive a domain `code`.
 
-The current `/health/db` failure response is HTTP 503 with only `detail` containing the exception text. Unexpected errors remain HTTP 500 and do not have a guaranteed domain-error JSON format. The collection does not imply otherwise.
+The `/health/db` failure response is HTTP 503 with only `detail`: `"Banco de dados indisponível."`. Technical exception details are logged on the server. Unexpected errors remain HTTP 500 and do not have a guaranteed domain-error JSON format. The collection does not imply otherwise.
 
 ## Verification
 
