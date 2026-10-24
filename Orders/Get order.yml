@@ -2,19 +2,105 @@ info:
   name: Get order
   type: http
   seq: 5
-
 http:
   method: GET
-  url: "{{api}}/orders/:id"
+  url: '{{api}}/orders/:id'
   params:
-    - name: id
-      value: f9574263-f21b-43ed-8ca9-e6d40ab058dc
-      type: path
+  - name: id
+    value: '{{order_id}}'
+    type: path
   auth: inherit
-
 settings:
   encodeUrl: true
   timeout: 0
   followRedirects: true
   maxRedirects: 5
   forwardAuthorizationHeader: false
+examples:
+- name: 200 - Order found
+  request:
+    method: GET
+    url: '{{api}}/orders/07c83ca3-e74d-42a4-94dd-df6398a62f64'
+  response:
+    status: 200
+    statusText: OK
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "id": "07c83ca3-e74d-42a4-94dd-df6398a62f64",
+          "table_id": "916ce46a-fd23-4fa5-837d-936d2250151e",
+          "table_number": 2,
+          "status": "Aberto",
+          "items": [
+            {
+              "id": "feaa0567-ecea-420d-9d9a-1f8a1e369054",
+              "product_id": "f4eb300a-2679-49ce-b90e-df4b21c9c699",
+              "product_name": "Snickers",
+              "quantity": 4,
+              "unit_price": "6.00",
+              "created_at": "2026-10-24T20:32:17.544943Z",
+              "updated_at": "2026-10-24T20:32:17.544943Z",
+              "subtotal": "24.00"
+            }
+          ],
+          "created_at": "2026-10-24T20:32:17.544943Z",
+          "updated_at": "2026-10-24T20:32:17.544943Z"
+        }
+- name: 404 - Order not found
+  request:
+    method: GET
+    url: '{{api}}/orders/00000000-0000-4000-8000-000000000000'
+  response:
+    status: 404
+    statusText: Not Found
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "code": "order_not_found",
+          "detail": "Pedido não encontrado."
+        }
+- name: 422 - Invalid input
+  request:
+    method: GET
+    url: '{{api}}/orders/invalid-uuid'
+  response:
+    status: 422
+    statusText: Unprocessable Entity
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "detail": [
+            {
+              "type": "uuid_parsing",
+              "loc": [
+                "path",
+                "order_id"
+              ],
+              "msg": "Input should be a valid UUID, invalid character: found `i` at 1",
+              "input": "invalid-uuid",
+              "ctx": {
+                "error": "invalid character: found `i` at 1"
+              }
+            }
+          ]
+        }
+docs: |
+  # Get order
+
+  Saved examples contain actual responses captured with TestClient and an isolated PostgreSQL database. IDs and timestamps are illustrative; use the maitre-local environment variables for live requests.
+
+  Documented HTTP statuses: 200, 404, 422.
+
+  Domain errors use `{ "code": "stable_error_code", "detail": "message" }`. Validation errors (422) retain the native FastAPI `detail` array.

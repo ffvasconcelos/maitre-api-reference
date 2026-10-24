@@ -2,23 +2,85 @@ info:
   name: List orders
   type: http
   seq: 6
-
 http:
   method: GET
-  url: "{{api}}/orders?table_id=aeeb47e7-c2cd-4666-886f-f9944ec48a0e"
+  url: '{{api}}/orders'
   params:
-    - name: status
-      value: Fechado
-      type: query
-      disabled: true
-    - name: table_id
-      value: aeeb47e7-c2cd-4666-886f-f9944ec48a0e
-      type: query
+  - name: status
+    value: Aberto
+    type: query
+    disabled: true
+  - name: table_id
+    value: '{{table_id}}'
+    type: query
+    disabled: true
   auth: inherit
-
 settings:
   encodeUrl: true
   timeout: 0
   followRedirects: true
   maxRedirects: 5
   forwardAuthorizationHeader: false
+examples:
+- name: 200 - Orders filtered by table and status
+  request:
+    method: GET
+    url: '{{api}}/orders?table_id=916ce46a-fd23-4fa5-837d-936d2250151e&status=Aberto'
+  response:
+    status: 200
+    statusText: OK
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        [
+          {
+            "id": "07c83ca3-e74d-42a4-94dd-df6398a62f64",
+            "table_id": "916ce46a-fd23-4fa5-837d-936d2250151e",
+            "table_number": 2,
+            "status": "Aberto",
+            "created_at": "2026-10-24T20:32:17.544943Z",
+            "updated_at": "2026-10-24T20:32:17.544943Z"
+          }
+        ]
+- name: 422 - Invalid input
+  request:
+    method: GET
+    url: '{{api}}/orders?status=INVALID'
+  response:
+    status: 422
+    statusText: Unprocessable Entity
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "detail": [
+            {
+              "type": "enum",
+              "loc": [
+                "query",
+                "status"
+              ],
+              "msg": "Input should be 'Aberto', 'Fechado' or 'Cancelado'",
+              "input": "INVALID",
+              "ctx": {
+                "expected": "'Aberto', 'Fechado' or 'Cancelado'"
+              }
+            }
+          ]
+        }
+docs: |
+  # List orders
+
+  Saved examples contain actual responses captured with TestClient and an isolated PostgreSQL database. IDs and timestamps are illustrative; use the maitre-local environment variables for live requests.
+
+  Documented HTTP statuses: 200, 422.
+
+  Domain errors use `{ "code": "stable_error_code", "detail": "message" }`. Validation errors (422) retain the native FastAPI `detail` array.
+
+  Optional filters are disabled by default. Enable table_id and/or status to filter. Allowed order statuses: Aberto, Fechado, Cancelado. List entries omit items.

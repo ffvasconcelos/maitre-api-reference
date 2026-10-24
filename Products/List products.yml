@@ -2,15 +2,55 @@ info:
   name: List products
   type: http
   seq: 2
-
 http:
   method: GET
-  url: "{{api}}/products"
+  url: '{{api}}/products'
   auth: inherit
-
 settings:
   encodeUrl: true
   timeout: 0
   followRedirects: true
   maxRedirects: 5
   forwardAuthorizationHeader: false
+examples:
+- name: 200 - Product list
+  request:
+    method: GET
+    url: '{{api}}/products'
+  response:
+    status: 200
+    statusText: OK
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        [
+          {
+            "id": "f4eb300a-2679-49ce-b90e-df4b21c9c699",
+            "name": "Snickers",
+            "description": "Chocolate Snickers",
+            "price": "6.00",
+            "active": true,
+            "created_at": "2026-10-24T20:32:17.512704Z",
+            "updated_at": "2026-10-24T20:32:17.512704Z"
+          },
+          {
+            "id": "96b1afb1-6c7d-4957-851b-5c273c0f5763",
+            "name": "Inactive product",
+            "description": null,
+            "price": "2.00",
+            "active": false,
+            "created_at": "2026-10-24T20:32:17.515820Z",
+            "updated_at": "2026-10-24T20:32:17.515820Z"
+          }
+        ]
+docs: |
+  # List products
+
+  Saved examples contain actual responses captured with TestClient and an isolated PostgreSQL database. IDs and timestamps are illustrative; use the maitre-local environment variables for live requests.
+
+  Documented HTTP statuses: 200.
+
+  Domain errors use `{ "code": "stable_error_code", "detail": "message" }`. Validation errors (422) retain the native FastAPI `detail` array.

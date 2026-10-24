@@ -2,19 +2,124 @@ info:
   name: Cancel order
   type: http
   seq: 3
-
 http:
   method: POST
-  url: "{{api}}/orders/:id/cancel"
+  url: '{{api}}/orders/:id/cancel'
   params:
-    - name: id
-      value: 614d74c1-2dfb-4e08-977d-5e865dc42242
-      type: path
+  - name: id
+    value: '{{order_id}}'
+    type: path
   auth: inherit
-
 settings:
   encodeUrl: true
   timeout: 0
   followRedirects: true
   maxRedirects: 5
   forwardAuthorizationHeader: false
+examples:
+- name: 200 - Order cancelled
+  request:
+    method: POST
+    url: '{{api}}/orders/33f7bec4-7528-426b-9529-88b3399a80be/cancel'
+  response:
+    status: 200
+    statusText: OK
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "id": "33f7bec4-7528-426b-9529-88b3399a80be",
+          "table_id": "916ce46a-fd23-4fa5-837d-936d2250151e",
+          "table_number": 2,
+          "status": "Cancelado",
+          "items": [
+            {
+              "id": "d47beab6-0202-46d0-9904-07801a52fb46",
+              "product_id": "f4eb300a-2679-49ce-b90e-df4b21c9c699",
+              "product_name": "Snickers",
+              "quantity": 4,
+              "unit_price": "6.00",
+              "created_at": "2026-10-24T20:32:17.585553Z",
+              "updated_at": "2026-10-24T20:32:17.585553Z",
+              "subtotal": "24.00"
+            }
+          ],
+          "created_at": "2026-10-24T20:32:17.585553Z",
+          "updated_at": "2026-10-24T20:32:17.589491Z"
+        }
+- name: 404 - Order not found
+  request:
+    method: POST
+    url: '{{api}}/orders/00000000-0000-4000-8000-000000000000/cancel'
+  response:
+    status: 404
+    statusText: Not Found
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "code": "order_not_found",
+          "detail": "Pedido não encontrado."
+        }
+- name: 409 - Order no longer open
+  request:
+    method: POST
+    url: '{{api}}/orders/07c83ca3-e74d-42a4-94dd-df6398a62f64/cancel'
+  response:
+    status: 409
+    statusText: Conflict
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "code": "order_not_open",
+          "detail": "O pedido não está mais aberto (07c83ca3-e74d-42a4-94dd-df6398a62f64)."
+        }
+- name: 422 - Invalid input
+  request:
+    method: POST
+    url: '{{api}}/orders/invalid-uuid/cancel'
+  response:
+    status: 422
+    statusText: Unprocessable Entity
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "detail": [
+            {
+              "type": "uuid_parsing",
+              "loc": [
+                "path",
+                "order_id"
+              ],
+              "msg": "Input should be a valid UUID, invalid character: found `i` at 1",
+              "input": "invalid-uuid",
+              "ctx": {
+                "error": "invalid character: found `i` at 1"
+              }
+            }
+          ]
+        }
+docs: |
+  # Cancel order
+
+  Saved examples contain actual responses captured with TestClient and an isolated PostgreSQL database. IDs and timestamps are illustrative; use the maitre-local environment variables for live requests.
+
+  Documented HTTP statuses: 200, 404, 409, 422.
+
+  Domain errors use `{ "code": "stable_error_code", "detail": "message" }`. Validation errors (422) retain the native FastAPI `detail` array.
+
+  This action requires an open order and releases its table. Closing and cancelling are alternative terminal transitions; create another order to try the other action.

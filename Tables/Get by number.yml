@@ -2,19 +2,90 @@ info:
   name: Get by number
   type: http
   seq: 4
-
 http:
   method: GET
-  url: "{{api}}/tables/by_number/:number"
+  url: '{{api}}/tables/by_number/:number'
   params:
-    - name: number
-      value: "2"
-      type: path
+  - name: number
+    value: '{{table_number}}'
+    type: path
   auth: inherit
-
 settings:
   encodeUrl: true
   timeout: 0
   followRedirects: true
   maxRedirects: 5
   forwardAuthorizationHeader: false
+examples:
+- name: 200 - Table found
+  request:
+    method: GET
+    url: '{{api}}/tables/by_number/2'
+  response:
+    status: 200
+    statusText: OK
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "id": "916ce46a-fd23-4fa5-837d-936d2250151e",
+          "number": 2,
+          "capacity": 4,
+          "status": "disponível",
+          "created_at": "2026-10-24T20:32:17.518524Z",
+          "updated_at": "2026-10-24T20:32:17.518524Z"
+        }
+- name: 404 - Table number not found
+  request:
+    method: GET
+    url: '{{api}}/tables/by_number/999'
+  response:
+    status: 404
+    statusText: Not Found
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "code": "table_number_not_found",
+          "detail": "Número da mesa não encontrado (999)."
+        }
+- name: 422 - Invalid input
+  request:
+    method: GET
+    url: '{{api}}/tables/by_number/invalid-number'
+  response:
+    status: 422
+    statusText: Unprocessable Entity
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "detail": [
+            {
+              "type": "int_parsing",
+              "loc": [
+                "path",
+                "number"
+              ],
+              "msg": "Input should be a valid integer, unable to parse string as an integer",
+              "input": "invalid-number"
+            }
+          ]
+        }
+docs: |
+  # Get by number
+
+  Saved examples contain actual responses captured with TestClient and an isolated PostgreSQL database. IDs and timestamps are illustrative; use the maitre-local environment variables for live requests.
+
+  Documented HTTP statuses: 200, 404, 422.
+
+  Domain errors use `{ "code": "stable_error_code", "detail": "message" }`. Validation errors (422) retain the native FastAPI `detail` array.

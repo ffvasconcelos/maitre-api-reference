@@ -2,19 +2,94 @@ info:
   name: Get by id
   type: http
   seq: 3
-
 http:
   method: GET
-  url: "{{api}}/products/:id"
+  url: '{{api}}/products/:id'
   params:
-    - name: id
-      value: e3c27432-261b-4a1f-900e-1c1d42b1fb8a
-      type: path
+  - name: id
+    value: '{{product_id}}'
+    type: path
   auth: inherit
-
 settings:
   encodeUrl: true
   timeout: 0
   followRedirects: true
   maxRedirects: 5
   forwardAuthorizationHeader: false
+examples:
+- name: 200 - Product found
+  request:
+    method: GET
+    url: '{{api}}/products/f4eb300a-2679-49ce-b90e-df4b21c9c699'
+  response:
+    status: 200
+    statusText: OK
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "id": "f4eb300a-2679-49ce-b90e-df4b21c9c699",
+          "name": "Snickers",
+          "description": "Chocolate Snickers",
+          "price": "6.00",
+          "active": true,
+          "created_at": "2026-10-24T20:32:17.512704Z",
+          "updated_at": "2026-10-24T20:32:17.512704Z"
+        }
+- name: 404 - Product not found
+  request:
+    method: GET
+    url: '{{api}}/products/00000000-0000-4000-8000-000000000000'
+  response:
+    status: 404
+    statusText: Not Found
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "code": "product_not_found",
+          "detail": "O produto não existe (00000000-0000-4000-8000-000000000000)."
+        }
+- name: 422 - Invalid input
+  request:
+    method: GET
+    url: '{{api}}/products/invalid-uuid'
+  response:
+    status: 422
+    statusText: Unprocessable Entity
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "detail": [
+            {
+              "type": "uuid_parsing",
+              "loc": [
+                "path",
+                "product_id"
+              ],
+              "msg": "Input should be a valid UUID, invalid character: found `i` at 1",
+              "input": "invalid-uuid",
+              "ctx": {
+                "error": "invalid character: found `i` at 1"
+              }
+            }
+          ]
+        }
+docs: |
+  # Get by id
+
+  Saved examples contain actual responses captured with TestClient and an isolated PostgreSQL database. IDs and timestamps are illustrative; use the maitre-local environment variables for live requests.
+
+  Documented HTTP statuses: 200, 404, 422.
+
+  Domain errors use `{ "code": "stable_error_code", "detail": "message" }`. Validation errors (422) retain the native FastAPI `detail` array.

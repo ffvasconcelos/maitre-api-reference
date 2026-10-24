@@ -2,22 +2,136 @@ info:
   name: Create
   type: http
   seq: 1
-
 http:
   method: POST
-  url: "{{api}}/tables"
+  url: '{{api}}/tables'
   body:
     type: json
     data: |-
       {
-        "number": 2,
+        "number": {{table_number}},
         "capacity": 4
       }
   auth: inherit
-
+  headers:
+  - name: Content-Type
+    value: application/json
 settings:
   encodeUrl: true
   timeout: 0
   followRedirects: true
   maxRedirects: 5
   forwardAuthorizationHeader: false
+examples:
+- name: 201 - Table created
+  request:
+    method: POST
+    url: '{{api}}/tables'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "number": 2,
+          "capacity": 4
+        }
+  response:
+    status: 201
+    statusText: Created
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "id": "916ce46a-fd23-4fa5-837d-936d2250151e",
+          "number": 2,
+          "capacity": 4,
+          "status": "disponível",
+          "created_at": "2026-10-24T20:32:17.518524Z",
+          "updated_at": "2026-10-24T20:32:17.518524Z"
+        }
+- name: 409 - Duplicate table number
+  request:
+    method: POST
+    url: '{{api}}/tables'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "number": 2,
+          "capacity": 4
+        }
+  response:
+    status: 409
+    statusText: Conflict
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "code": "table_number_already_exists",
+          "detail": "Já existe uma mesa com o número 2."
+        }
+- name: 422 - Invalid input
+  request:
+    method: POST
+    url: '{{api}}/tables'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "number": 0,
+          "capacity": 4
+        }
+  response:
+    status: 422
+    statusText: Unprocessable Entity
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "detail": [
+            {
+              "type": "greater_than",
+              "loc": [
+                "body",
+                "number"
+              ],
+              "msg": "Input should be greater than 0",
+              "input": 0,
+              "ctx": {
+                "gt": 0
+              }
+            }
+          ]
+        }
+runtime:
+  scripts:
+  - type: after-response
+    code: |-
+      if (res.status === 201) {
+        bru.setVar("table_id", res.body.id);
+      }
+docs: |
+  # Create
+
+  Saved examples contain actual responses captured with TestClient and an isolated PostgreSQL database. IDs and timestamps are illustrative; use the maitre-local environment variables for live requests.
+
+  Documented HTTP statuses: 201, 409, 422.
+
+  Domain errors use `{ "code": "stable_error_code", "detail": "message" }`. Validation errors (422) retain the native FastAPI `detail` array.

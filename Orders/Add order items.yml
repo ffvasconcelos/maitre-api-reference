@@ -2,28 +2,251 @@ info:
   name: Add order items
   type: http
   seq: 2
-
 http:
   method: POST
-  url: "{{api}}/orders/:id/items"
+  url: '{{api}}/orders/:id/items'
   params:
-    - name: id
-      value: 614d74c1-2dfb-4e08-977d-5e865dc42242
-      type: path
+  - name: id
+    value: '{{order_id}}'
+    type: path
   body:
     type: json
     data: |-
       [
         {
-          "product_id": "e8dfb54c-40d1-446f-ad81-cbf48ad42fe1",
-          "quantity": 4
+          "product_id": "{{product_id}}",
+          "quantity": 1
         }
       ]
   auth: inherit
-
+  headers:
+  - name: Content-Type
+    value: application/json
 settings:
   encodeUrl: true
   timeout: 0
   followRedirects: true
   maxRedirects: 5
   forwardAuthorizationHeader: false
+examples:
+- name: 201 - Items added
+  request:
+    method: POST
+    url: '{{api}}/orders/07c83ca3-e74d-42a4-94dd-df6398a62f64/items'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        [
+          {
+            "product_id": "f4eb300a-2679-49ce-b90e-df4b21c9c699",
+            "quantity": 1
+          }
+        ]
+  response:
+    status: 201
+    statusText: Created
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "id": "07c83ca3-e74d-42a4-94dd-df6398a62f64",
+          "table_id": "916ce46a-fd23-4fa5-837d-936d2250151e",
+          "table_number": 2,
+          "status": "Aberto",
+          "items": [
+            {
+              "id": "feaa0567-ecea-420d-9d9a-1f8a1e369054",
+              "product_id": "f4eb300a-2679-49ce-b90e-df4b21c9c699",
+              "product_name": "Snickers",
+              "quantity": 4,
+              "unit_price": "6.00",
+              "created_at": "2026-10-24T20:32:17.544943Z",
+              "updated_at": "2026-10-24T20:32:17.544943Z",
+              "subtotal": "24.00"
+            },
+            {
+              "id": "fc7f17ea-2bb3-4fd3-a665-e1547eeb3ccf",
+              "product_id": "f4eb300a-2679-49ce-b90e-df4b21c9c699",
+              "product_name": "Snickers",
+              "quantity": 1,
+              "unit_price": "6.00",
+              "created_at": "2026-10-24T20:32:17.560349Z",
+              "updated_at": "2026-10-24T20:32:17.560349Z",
+              "subtotal": "6.00"
+            }
+          ],
+          "created_at": "2026-10-24T20:32:17.544943Z",
+          "updated_at": "2026-10-24T20:32:17.544943Z"
+        }
+- name: 404 - Order not found
+  request:
+    method: POST
+    url: '{{api}}/orders/00000000-0000-4000-8000-000000000000/items'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        [
+          {
+            "product_id": "f4eb300a-2679-49ce-b90e-df4b21c9c699",
+            "quantity": 1
+          }
+        ]
+  response:
+    status: 404
+    statusText: Not Found
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "code": "order_not_found",
+          "detail": "Pedido não encontrado."
+        }
+- name: 404 - product_not_found
+  request:
+    method: POST
+    url: '{{api}}/orders/07c83ca3-e74d-42a4-94dd-df6398a62f64/items'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        [
+          {
+            "product_id": "00000000-0000-4000-8000-000000000000",
+            "quantity": 1
+          }
+        ]
+  response:
+    status: 404
+    statusText: Not Found
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "code": "product_not_found",
+          "detail": "O produto não existe (00000000-0000-4000-8000-000000000000)."
+        }
+- name: 409 - product_not_active
+  request:
+    method: POST
+    url: '{{api}}/orders/07c83ca3-e74d-42a4-94dd-df6398a62f64/items'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        [
+          {
+            "product_id": "96b1afb1-6c7d-4957-851b-5c273c0f5763",
+            "quantity": 1
+          }
+        ]
+  response:
+    status: 409
+    statusText: Conflict
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "code": "product_not_active",
+          "detail": "O produto não está ativo (96b1afb1-6c7d-4957-851b-5c273c0f5763)."
+        }
+- name: 409 - Order no longer open
+  request:
+    method: POST
+    url: '{{api}}/orders/07c83ca3-e74d-42a4-94dd-df6398a62f64/items'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        [
+          {
+            "product_id": "f4eb300a-2679-49ce-b90e-df4b21c9c699",
+            "quantity": 1
+          }
+        ]
+  response:
+    status: 409
+    statusText: Conflict
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "code": "order_not_open",
+          "detail": "O pedido não está mais aberto (07c83ca3-e74d-42a4-94dd-df6398a62f64)."
+        }
+- name: 422 - Invalid input
+  request:
+    method: POST
+    url: '{{api}}/orders/07c83ca3-e74d-42a4-94dd-df6398a62f64/items'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        [
+          {
+            "product_id": "f4eb300a-2679-49ce-b90e-df4b21c9c699",
+            "quantity": 0
+          }
+        ]
+  response:
+    status: 422
+    statusText: Unprocessable Entity
+    headers:
+    - name: content-type
+      value: application/json
+    body:
+      type: json
+      data: |-
+        {
+          "detail": [
+            {
+              "type": "greater_than",
+              "loc": [
+                "body",
+                0,
+                "quantity"
+              ],
+              "msg": "Input should be greater than 0",
+              "input": 0,
+              "ctx": {
+                "gt": 0
+              }
+            }
+          ]
+        }
+docs: |
+  # Add order items
+
+  Saved examples contain actual responses captured with TestClient and an isolated PostgreSQL database. IDs and timestamps are illustrative; use the maitre-local environment variables for live requests.
+
+  Documented HTTP statuses: 201, 404, 409, 422.
+
+  Domain errors use `{ "code": "stable_error_code", "detail": "message" }`. Validation errors (422) retain the native FastAPI `detail` array.

@@ -1,5 +1,17 @@
 name: maitre-local
 variables:
-  - name: api
-    value: http://localhost:8000
-    description: ""
+- name: api
+  value: http://127.0.0.1:8000
+  description: Base URL for the running API.
+- name: table_number
+  value: '2'
+  description: Use an unused positive number when creating a table.
+- name: table_id
+  value: 00000000-0000-4000-8000-000000000000
+  description: Replace with an existing UUID, or create the resource to capture it at runtime.
+- name: product_id
+  value: 00000000-0000-4000-8000-000000000000
+  description: Replace with an existing UUID, or create the resource to capture it at runtime.
+- name: order_id
+  value: 00000000-0000-4000-8000-000000000000
+  description: Replace with an existing UUID, or create the resource to capture it at runtime.
